@@ -1,0 +1,50 @@
+#################################################
+#  First Name  : Utsav
+#  Last Name  : Italiya
+#  Id   : 10475248
+
+rm(list = ls())
+
+#read data from csv file
+data <- read.csv("F:/Sem1/CS513/MidTerm/COVID19_v4.csv", header = TRUE, sep = ",")
+
+#Summarizing data before handling NA or null values
+summary(data)
+
+#converting table into dataframe and Identifying bad values to replace with NA 
+df <- data.frame(ID = as.integer(c(data$ID)), 
+                 Age = as.integer(c(data$Age)),
+                 Exposure = as.integer(c(data$Exposure)),
+                 MaritalStatus = c(data$MaritalStatus),
+                 Cases = as.integer(c(data$Cases)),
+                 MonthAtHospital = as.integer(c(data$MonthAtHospital)),
+                 Infected = c(data$Infected))
+
+#Omiting rows with NA values
+df <- na.omit(df)
+
+#converting Infected row in factors
+str(df)
+df[,"Infected"] <- factor(df[,"Infected"], levels = c("Yes", "No"), labels = c("0", "1"))
+str(df)
+
+#Nomralization of dataframe for KNN
+idx <- sample(1:nrow(df), 0.7 * nrow(df))
+nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
+norm <- as.data.frame(lapply(df[,c(2,3,5,6)], nor))
+
+#using 70% data for testing and 30% data for training classificaion model
+df2 = df['Infected']
+train <- norm[idx,] 
+class_train <- df2[idx,]
+test <- norm[-idx,]
+class_test <- df2[-idx,]
+
+library(class)
+accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+
+#classification model for diagnosis where value of k is 3
+predict_k5 <- knn(train, test, cl  = class_train , k=5)
+confusion_matrix <- table(predict_k5,class_test)
+confusion_matrix
+accuracy(confusion_matrix)

@@ -1,0 +1,45 @@
+---
+title: "hw9_Utsav_Italiya_10475248"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+Comments: reading the files and loading the data
+```{r}
+rm(list = ls())
+library(e1071)
+
+df <- read.csv("F:/Sem1/CS513/lecture9/wisc_bc_ContinuousVar.csv",header=TRUE, sep=",")
+df <- subset(df, select = -c(id))
+df$diagnosis<-factor(df$diagnosis,  levels = c('M','B'),labels = c(1,2))
+View(df)
+```
+
+Comments: training and testing datasets
+```{r}
+#70% training and 30% testing data
+idx<-sort(sample(nrow(df),as.integer(.70*nrow(df))))
+training<-df[idx,]
+testing<-df[-idx,]
+```
+
+Comments: performing svm model and finding accuracy
+```{r}
+#training SVM model
+svm_model <- svm( diagnosis~ ., data = training  )
+svm_prediction <- predict(svm_model,  testing )
+
+```
+
+```{r}
+#confusion matrix and accuracy
+confusion_matrix <-table(predict_svm = svm_prediction, class = testing$diagnosis)
+confusion_matrix
+
+```
+
+```{r}
+accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+accuracy(confusion_matrix)
+```

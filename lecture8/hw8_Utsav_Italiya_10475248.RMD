@@ -1,0 +1,42 @@
+---
+title: "hw8_Utsav_Italiya_10475248"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+Comments: reading the files and loading the data
+
+```{r}
+rm(list=ls())
+#load data from csv file
+df<-read.csv("F:/Sem1/CS513/lecture7/wisc_bc_ContinuousVar.csv",na.strings = '?')#Change the path accordingly.
+summary(df)
+
+#table for categories of daignosis
+table(df$diagnosis)
+
+#factor the data set
+df<-na.omit(df)
+df<-df[-1]
+```
+
+Comments: performing clustering using hclust
+
+```{r}
+#clustered rows against the “diagnosis” column
+df_dist<-dist(df[,c(-1,-2)])
+hclust_results<-hclust(df_dist)
+plot(hclust_results)
+
+hclust_2<-cutree(hclust_results,2)
+table(hclust_2,df[,1])
+```
+
+Comments: #performing clustering using kmeans
+
+```{r}
+kmeans_2<- kmeans(df[,-1],2,nstart = 10)
+kmeans_2$cluster
+table(kmeans_2$cluster,df[,1])
+```
